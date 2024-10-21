@@ -1,0 +1,22 @@
+{
+  "name": "dragntask",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "turbo run dev",
+    "format": "biome format . --write"
+  },
+  "workspaces": [
+    "apps/*"
+  ],
+  "dependencies": {
+    "turbo": "^2.2.1"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4"
+  },
+  "trustedDependencies": [
+    "@biomejs/biome",
+    "@swc/core",
+    "esbuild"
+  ]
+}
