@@ -11,7 +11,7 @@ export const pg = new PGlite({
 
 export const db = drizzle({ client: pg })
 
-const migrations = ['/drizzle/0000_initial_schema.sql?raw']
+const migrations = ['/drizzle/0000_initial_schema.sql']
 
 async function migrate() {
 	for (const migrationFile of migrations) {

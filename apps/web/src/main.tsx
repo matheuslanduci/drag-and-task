@@ -18,6 +18,7 @@ const reactRoot = createRoot(rootElement)
 
 reactRoot.render(
 	<StrictMode>
+		{/* @ts-ignore */}
 		<PGliteProvider db={pg}>
 			<RouterProvider router={router} />
 		</PGliteProvider>

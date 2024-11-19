@@ -1,3 +1,4 @@
+import { BoardPage } from './routes/board'
 import { Home } from './routes/home'
 import { Root } from './routes/root'
 
@@ -11,6 +12,7 @@ export const router = createBrowserRouter(
 	createRoutesFromElements(
 		<Route path="/" element={<Root />}>
 			<Route index element={<Home />} />
+			<Route path="boards/:id" element={<BoardPage />} />
 		</Route>
 	)
 )

@@ -1,3 +1,4 @@
+import { DeleteBoardDialog } from '@/components/boards/delete-board-dialog'
 import { NewBoardDialog } from '@/components/boards/new-board-dialog'
 import { LoadingScreen } from '@/components/loading-screen'
 import { Button } from '@/components/ui/button'
@@ -38,6 +39,8 @@ import { Link } from 'react-router-dom'
 export function Home() {
 	const items = useLiveQuery<Board>(db.select().from(boardsTable).toSQL().sql)
 	const [isCreationDialogOpen, setIsCreationDialogOpen] = useState(false)
+	const [isDeletionDialogOpen, setIsDeletionDialogOpen] = useState(false)
+	const [selectedBoard, setSelectedBoard] = useState<Board | null>(null)
 
 	const setHeaderActions = useUI((state) => state.setHeaderActions)
 
@@ -63,74 +66,94 @@ export function Home() {
 	}
 
 	return (
-		<div className="container mx-auto">
-			<div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-				{items.rows.map((board) => (
-					<Card key={board.id}>
-						<CardHeader className="flex flex-row items-center justify-between">
-							<div className="flex flex-col gap-2">
-								<CardTitle>{board.title}</CardTitle>
-								<CardDescription>
-									Created at: {board.createdAt.toLocaleDateString()}
-								</CardDescription>
-							</div>
+		<div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+			{items.rows.length === 0 && (
+				<div className="flex flex-col gap-2 items-center mx-auto col-span-full">
+					No boards found
+					<Button onClick={() => setIsCreationDialogOpen(true)}>
+						Create a new board
+					</Button>
+				</div>
+			)}
+			{items.rows.map((board) => (
+				<Card key={board.id}>
+					<CardHeader className="flex flex-row items-center justify-between">
+						<div className="flex flex-col gap-2">
+							<CardTitle>{board.title}</CardTitle>
+							<CardDescription>
+								Created at: {board.createdAt.toLocaleDateString()}
+							</CardDescription>
+						</div>
 
-							<div className="flex gap-2">
-								<Tooltip>
-									<TooltipTrigger asChild>
-										<Button variant="outline" asChild size="icon">
-											<Link to={`/boards/${board.id}`}>
+						<div className="flex gap-2">
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<Button variant="outline" asChild size="icon">
+										<Link to={`/boards/${board.id}`}>
+											<SquareArrowOutUpRight />
+										</Link>
+									</Button>
+								</TooltipTrigger>
+
+								<TooltipContent>Go to board {board.title}</TooltipContent>
+							</Tooltip>
+
+							<Tooltip>
+								<DropdownMenu>
+									<DropdownMenuTrigger asChild>
+										<TooltipTrigger asChild>
+											<Button variant="ghost" size="icon">
+												<EllipsisVertical />
+											</Button>
+										</TooltipTrigger>
+									</DropdownMenuTrigger>
+
+									<TooltipContent>More options</TooltipContent>
+
+									<DropdownMenuContent className="w-56">
+										<DropdownMenuLabel>{board.title}</DropdownMenuLabel>
+										<DropdownMenuSeparator />
+
+										<DropdownMenuGroup>
+											<DropdownMenuItem>
 												<SquareArrowOutUpRight />
-											</Link>
-										</Button>
-									</TooltipTrigger>
 
-									<TooltipContent>Go to board {board.title}</TooltipContent>
-								</Tooltip>
+												<span>Go to</span>
+											</DropdownMenuItem>
 
-								<Tooltip>
-									<DropdownMenu>
-										<DropdownMenuTrigger asChild>
-											<TooltipTrigger asChild>
-												<Button variant="ghost" size="icon">
-													<EllipsisVertical />
-												</Button>
-											</TooltipTrigger>
-										</DropdownMenuTrigger>
+											<DropdownMenuItem>
+												<Pencil />
 
-										<TooltipContent>More options</TooltipContent>
+												<span>Edit</span>
+											</DropdownMenuItem>
 
-										<DropdownMenuContent className="w-56">
-											<DropdownMenuLabel>Board {board.title}</DropdownMenuLabel>
-											<DropdownMenuSeparator />
+											<DropdownMenuItem
+												className="text-red-500"
+												onClick={() => {
+													setSelectedBoard(board)
+													setIsDeletionDialogOpen(true)
+												}}
+											>
+												<Trash />
 
-											<DropdownMenuGroup>
-												<DropdownMenuItem>
-													<SquareArrowOutUpRight />
+												<span>Delete</span>
+											</DropdownMenuItem>
+										</DropdownMenuGroup>
+									</DropdownMenuContent>
+								</DropdownMenu>
+							</Tooltip>
+						</div>
+					</CardHeader>
+				</Card>
+			))}
 
-													<span>Go to</span>
-												</DropdownMenuItem>
-
-												<DropdownMenuItem>
-													<Pencil />
-
-													<span>Edit</span>
-												</DropdownMenuItem>
-
-												<DropdownMenuItem className="text-red-500">
-													<Trash />
-
-													<span>Delete</span>
-												</DropdownMenuItem>
-											</DropdownMenuGroup>
-										</DropdownMenuContent>
-									</DropdownMenu>
-								</Tooltip>
-							</div>
-						</CardHeader>
-					</Card>
-				))}
-			</div>
+			{selectedBoard && (
+				<DeleteBoardDialog
+					open={isDeletionDialogOpen}
+					onOpenChange={setIsDeletionDialogOpen}
+					board={selectedBoard}
+				/>
+			)}
 		</div>
 	)
 }

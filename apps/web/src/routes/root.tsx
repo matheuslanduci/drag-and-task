@@ -11,7 +11,9 @@ export function Root() {
 			<TooltipProvider>
 				<AppHeader />
 				<Toaster />
-				<Outlet />
+				<div className="container py-4 mx-auto">
+					<Outlet />
+				</div>
 			</TooltipProvider>
 		</ThemeProvider>
 	)

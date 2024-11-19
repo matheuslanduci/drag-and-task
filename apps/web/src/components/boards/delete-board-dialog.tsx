@@ -1,4 +1,7 @@
-import type { Board } from '@/db/schema'
+import { boardsTable, type Board } from '@/db/schema'
+import { useToast } from '@/hooks/use-toast'
+import { db } from '@/resources/db'
+
 import {
 	Dialog,
 	DialogClose,
@@ -9,6 +12,8 @@ import {
 	DialogTitle
 } from '../ui/dialog'
 import { Button } from '../ui/button'
+
+import { eq } from 'drizzle-orm'
 
 type DeleteBoardDialogProps = {
 	open: boolean
@@ -21,6 +26,17 @@ export function DeleteBoardDialog({
 	open,
 	board
 }: DeleteBoardDialogProps) {
+	const { toast } = useToast()
+
+	async function deleteBoard() {
+		await db.delete(boardsTable).where(eq(boardsTable.id, board.id)).execute()
+
+		toast({
+			title: 'Board deleted'
+		})
+		onOpenChange(false)
+	}
+
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent>
@@ -38,7 +54,7 @@ export function DeleteBoardDialog({
 						</Button>
 					</DialogClose>
 
-					<Button type="submit" variant="destructive">
+					<Button type="submit" variant="destructive" onClick={deleteBoard}>
 						Delete
 					</Button>
 				</DialogFooter>

@@ -1,5 +1,5 @@
 import { useToast } from '@/hooks/use-toast'
-import { boardsTable } from '@/db/schema'
+import { boardsTable, listsTable } from '@/db/schema'
 import { db } from '@/resources/db'
 
 import { Button } from '../ui/button'
@@ -47,12 +47,32 @@ export function NewBoardDialog({ onOpenChange, open }: NewBoardDialogProps) {
 	const { toast } = useToast()
 
 	async function onSubmit(values: FormValues) {
-		await db.insert(boardsTable).values(values).returning().execute()
+		const [board] = await db
+			.insert(boardsTable)
+			.values(values)
+			.returning()
+			.execute()
+
+		await db.insert(listsTable).values([
+			{
+				boardId: board.id,
+				title: 'Backlog'
+			},
+			{
+				boardId: board.id,
+				title: 'In Progress'
+			},
+			{
+				boardId: board.id,
+				title: 'Done'
+			}
+		])
 
 		toast({
 			title: 'Board created'
 		})
 		onOpenChange(false)
+		form.reset()
 	}
 
 	return (
